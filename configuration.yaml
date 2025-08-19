@@ -1,0 +1,29 @@
+
+sensor:
+  - platform: rest
+    name: AndroidAPS Workflow Status
+    resource: https://api.github.com/repos/vanelsberg/AndroidAPS/actions/workflows/180834796/runs
+    headers:
+      Authorization: !secret aaps_ci_access_token_header
+    value_template: "{{ value_json.workflow_runs[0].status }}"
+    json_attributes_path: "$.workflow_runs[0]"
+    json_attributes:
+      - created_at
+      - status
+      - conclusion
+
+template:
+  - sensor:
+      - name: "AndroidAPS Workflow Created At"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'created_at') }}"
+      - name: "AndroidAPS Workflow Conclusion"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'conclusion') }}"
+
+shell_command:
+  start_github_aaps_ci: 'bash /config/AAPS-CI/build.sh'
+
+script:
+  trigger_github_aaps_ci:
+    alias: "Start GitHub AAPS CI"
+    sequence:
+      - service: shell_command.start_github_aaps_ci
