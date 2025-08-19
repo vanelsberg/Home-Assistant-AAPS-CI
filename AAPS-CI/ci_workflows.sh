@@ -4,7 +4,7 @@
 cd "$(dirname "$(readlink -f "$0")")"
 
 # Set configuration
-source ./config.sh
+source ./build.config
 
 echo -e "Getting active workflows for repo $OWNER/$REPO:\n"
 

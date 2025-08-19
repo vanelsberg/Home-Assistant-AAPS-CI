@@ -6,7 +6,7 @@ cd "$(dirname "$(readlink -f "$0")")"
 # Import logging
 source ./logmessage.sh
 # Set configuration
-source ./config.sh
+source ./build.config
 
 #################################################################
 # Start integration task

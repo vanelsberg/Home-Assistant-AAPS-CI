@@ -4,7 +4,7 @@
 cd "$(dirname "$(readlink -f "$0")")"
 
 # Set configuration
-source ./config.sh
+source ./build.config
 
 echo -e "Workflow status for $OWNER/$REPO, ID=$WORKFLOW_ID:\n"
 

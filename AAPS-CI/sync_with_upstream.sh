@@ -4,7 +4,7 @@
 cd "$(dirname "$(readlink -f "$0")")"
 
 # Set configuration
-source ./config.sh
+source ./build.config
 
 echo "Syncing fork $OWNER/$REPO with upstream:"
 
