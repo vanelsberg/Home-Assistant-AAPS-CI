@@ -1,5 +1,7 @@
 # HomeAsistant AAPS_CI Integration
 
+[HA Dashboard](https://github.com/vanelsberg/Home-Assistant-AAPS-CI/blob/main/doc/HA-AAPS-CI-dashboard.png)
+
 Home Assistant integration of AAPS_CI (start button, status card). This integration enables you to start the AndroidAPS "browserbuild" workflow. To user this the AAPS CI workflow option must be anabled.
 
 See AndroidAPS Documentation on [Browser build](https://wiki.aaps.app/en/latest/SettingUpAaps/BrowserBuild.html)
