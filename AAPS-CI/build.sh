@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # Change current dir to  AAPS CI script location
-cd /config/AAPS-CI
+cd "$(dirname "$(readlink -f "$0")")"
 
-# Import logging and config
+# Import logging
 source ./logmessage.sh
+# Set configuration
 source ./config.sh
 
 #################################################################
