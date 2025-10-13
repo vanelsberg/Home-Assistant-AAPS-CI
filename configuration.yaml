@@ -1,5 +1,5 @@
-
 sensor:
+  # AAPS-CI
   - platform: rest
     name: AndroidAPS Workflow Status
     resource: https://api.github.com/repos/vanelsberg/AndroidAPS/actions/workflows/180834796/runs
@@ -14,10 +14,28 @@ sensor:
 
 template:
   - sensor:
+      # AAPS-CI
       - name: "AndroidAPS Workflow Created At"
         state: "{{ state_attr('sensor.androidaps_workflow_status', 'created_at') }}"
       - name: "AndroidAPS Workflow Conclusion"
         state: "{{ state_attr('sensor.androidaps_workflow_status', 'conclusion') }}"
+      - name: "CI Status Label"
+        state: >
+          {% set sc = state_attr('sensor.androidaps_workflow_status', 'conclusion') %}
+          {% set s = states('sensor.androidaps_workflow_status') %}
+          {% if sc == 'cancelled' %}
+            ⛔ Cancelled
+          {% elif s == 'queued' %}
+            ⏳ Queued
+          {% elif s == 'in_progress' %}
+            🟠 Running
+          {% elif s == 'completed' %}
+            ✅ Completed
+          {% elif s == 'failure' %}
+            ❌ Failed
+          {% else %}
+            ⚪ Idle
+          {% endif %}
 
 shell_command:
   start_github_aaps_ci: 'bash /config/AAPS-CI/build.sh'
