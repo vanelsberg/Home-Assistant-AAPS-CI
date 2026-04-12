@@ -1,8 +1,19 @@
+
+# Note: Make sure secrets are imported from script.yaml
+script: !include scripts.yaml
+
+# Add AAPS CI rest sensor to HA configuration
 sensor:
-  # AAPS-CI
+
+  # AAPS CI Worflow
+  # Note: In the resource url below change
+  # <YOUR_GITHUB_OWNER_NAME>      repo_user to you forked repo username
+  # <YOUR_GITHUB_FORKEDREPO_NAME> Your forked repo name (e.g. AndroidAPS)
+  # <YOUR_AAPS_CI_WORKFLOWID>     Your workflow ID (hint: use ci_workflows.sh)
+
   - platform: rest
     name: AndroidAPS Workflow Status
-    resource: https://api.github.com/repos/vanelsberg/AndroidAPS/actions/workflows/180834796/runs
+    resource: https://api.github.com/repos/<YOUR_GITHUB_OWNER_NAME>/<YOUR_GITHUB_FORKEDREPO_NAME>/actions/workflows/<YOUR_AAPS_CI_WORKFLOWID>/runs
     headers:
       Authorization: !secret aaps_ci_access_token_header
     value_template: "{{ value_json.workflow_runs[0].status }}"
@@ -11,10 +22,21 @@ sensor:
       - created_at
       - status
       - conclusion
+      - name
+      - run_number
+      - head_branch
+
+# Add AAPS CI sensor templates to HA configuration
 
 template:
   - sensor:
       # AAPS-CI
+      - name: "AndroidAPS Workflow Name"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'name') }}"
+      - name: "AndroidAPS Workflow Branch"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'head_branch') }}"
+      - name: "AndroidAPS Workflow Run Number"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'run_number') }}"
       - name: "AndroidAPS Workflow Created At"
         state: "{{ state_attr('sensor.androidaps_workflow_status', 'created_at') }}"
       - name: "AndroidAPS Workflow Conclusion"
@@ -25,14 +47,14 @@ template:
           {% set s = states('sensor.androidaps_workflow_status') %}
           {% if sc == 'cancelled' %}
             ⛔ Cancelled
+          {% elif sc == 'failure' %}
+            ❌ Failed
           {% elif s == 'queued' %}
             ⏳ Queued
           {% elif s == 'in_progress' %}
             🟠 Running
           {% elif s == 'completed' %}
             ✅ Completed
-          {% elif s == 'failure' %}
-            ❌ Failed
           {% else %}
             ⚪ Idle
           {% endif %}
