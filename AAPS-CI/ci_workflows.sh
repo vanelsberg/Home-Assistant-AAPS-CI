@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Set current dit to the location of this script
-cd "$(dirname "$(readlink -f "$0")")"
-
-# Set configuration
 source ./build.config
 
 echo -e "Getting active workflows for repo $OWNER/$REPO:\n"

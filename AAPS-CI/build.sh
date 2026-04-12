@@ -5,6 +5,7 @@ cd "$(dirname "$(readlink -f "$0")")"
 
 # Import logging
 source ./logmessage.sh
+
 # Set configuration
 source ./build.config
 
@@ -36,7 +37,7 @@ fi
 
 logmessage "Starting workflow AAPS CI for build variant ${OPT_BUILDVARIANT}"
 
-# Start workflow AAPS CI
+# Start AndroidAPS CI workflow
 curl -X POST \
   -H "Accept: application/vnd.github.v3+json" \
   -H "Authorization: Bearer $PERSONAL_ACCESS_TOKEN" \
@@ -44,7 +45,7 @@ curl -X POST \
   -d "{
     \"ref\": \"${BRANCH}\",
     \"inputs\": {
-        \"buildVariant\": \"${OPT_BUILDVARIANT}\"
+	\"buildVariant\": \"${OPT_BUILDVARIANT}\"
     }
   }"
 

@@ -1,9 +1,7 @@
 #!/bin/bash
-
 # Set current dit to the location of this script
 cd "$(dirname "$(readlink -f "$0")")"
 
-# Set configuration
 source ./build.config
 
 echo "Syncing fork $OWNER/$REPO with upstream:"
