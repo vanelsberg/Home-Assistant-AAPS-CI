@@ -1,0 +1,158 @@
+###############################################################################
+# GitHub Commit Monitor Package (Final, Working)
+###############################################################################
+
+# secrets.yaml:
+# github_repo: "vanelsberg/AndroidAPS"
+# github_branch: "master"
+
+input_text:
+  github_last_built_sha:
+    name: "GitHub Last Built SHA"
+    max: 64
+
+###############################################################################
+# REST: Latest commit (separate sensors for each field)
+###############################################################################
+rest:
+  # - resource: "https://api.github.com/repos/{{secrets.github_repo}}/commits?sha={{secrets.github_branch}}"
+  # - resource: "https://api.github.com/repos/nightscout/AndroidAPS/commits?sha=dev"
+  # - resource_template: "{{ states('sensor.github_commit_url') }}"
+  # n- resource: "https://api.github.com/repos/!secret github_repo/commits?sha=!secret github_branch"
+  - resource: !secret github_commits_url
+    scan_interval: 900  # 15 minutes
+    #scan_interval: 60
+    headers:
+      User-Agent: HomeAssistant
+    sensor:
+      - name: "GitHub Latest Commit SHA Raw"
+        unique_id: github_latest_commit_sha_raw
+        value_template: "{{ value_json[0].sha }}"
+
+      - name: "GitHub Latest Commit Message Raw"
+        unique_id: github_latest_commit_message_raw
+        value_template: "{{ value_json[0].commit.message }}"
+
+      - name: "GitHub Latest Commit Timestamp Raw"
+        unique_id: github_latest_commit_timestamp_raw
+        value_template: "{{ value_json[0].commit.author.date }}"
+
+###############################################################################
+# REST: GitHub rate limit
+###############################################################################
+  - resource: https://api.github.com/rate_limit
+    scan_interval: 900
+    headers:
+      User-Agent: HomeAssistant
+    sensor:
+      - name: "GitHub Rate Limit Remaining Raw"
+        unique_id: github_rate_limit_remaining_raw
+        value_template: "{{ value_json.resources.core.remaining }}"
+      - name: "GitHub Rate Limit Reset Raw"
+        unique_id: github_rate_limit_reset_raw
+        value_template: "{{ value_json.resources.core.reset }}"
+
+###############################################################################
+# Template sensors (clean, reliable)
+###############################################################################
+template:
+  - sensor:
+      - name: "GitHub Commit Info"
+        state: "{{ states('sensor.github_latest_commit_age_hours') }}"
+        attributes:
+          sha: "{{ states('sensor.github_latest_commit_sha') }}"
+          message: "{{ states('sensor.github_latest_commit_message') }}"
+          timestamp: "{{ states('sensor.github_latest_commit_timestamp') }}"
+
+      - name: "GitHub Latest Commit SHA"
+        unique_id: github_latest_commit_sha
+        state: "{{ states('sensor.github_latest_commit_sha_raw') }}"
+
+      - name: "GitHub Latest Commit Message"
+        unique_id: github_latest_commit_message
+        state: "{{ states('sensor.github_latest_commit_message_raw') }}"
+
+      - name: "GitHub Latest Commit Timestamp"
+        unique_id: github_latest_commit_timestamp
+        device_class: timestamp
+        state: "{{ states('sensor.github_latest_commit_timestamp_raw') }}"
+
+      - name: "GitHub Latest Commit Age Hours"
+        unique_id: github_latest_commit_age_hours
+        unit_of_measurement: "h"
+        state_class: measurement
+        state: >
+          {% set ts = states('sensor.github_latest_commit_timestamp_raw') %}
+          {% if ts not in ['unknown', '', None] %}
+            {{ ((as_timestamp(now()) - as_timestamp(ts)) / 3600) | int }}
+          {% else %}
+            unknown
+          {% endif %}
+
+      - name: "GitHub Rate Limit Remaining"
+        unique_id: github_rate_limit_remaining
+        state: "{{ states('sensor.github_rate_limit_remaining_raw') }}"
+
+      - name: "GitHub Rate Limit Reset"
+        unique_id: github_rate_limit_reset
+        device_class: timestamp
+        state: >
+          {% set ts = states('sensor.github_rate_limit_reset_raw') %}
+          {% if ts not in ['unknown', '', None] %}
+            {{ ts | int | timestamp_local }}
+          {% else %}
+            unknown
+          {% endif %}
+
+  - binary_sensor:
+      - name: "GitHub New Commit Available"
+        unique_id: github_new_commit_available
+        state: >
+          {% set latest = states('sensor.github_latest_commit_sha') %}
+          {% set last = states('input_text.github_last_built_sha') %}
+          {{ latest not in ['unknown', '', None] and latest != last }}
+
+###############################################################################
+# Automation: build on new commit (<24h) and store SHA
+# Note: Uses AAPS-CI Integration
+###############################################################################
+
+#alias: Schedule AAPS-CI
+#description: ""
+#triggers:
+#  - trigger: time_pattern
+#    hours: "6"
+#    minutes: "0"
+#    seconds: "0"
+#conditions:
+#  - condition: numeric_state
+#    entity_id: sensor.github_latest_commit_age_hours
+#    below: 72
+#    above: 0
+#  - condition: state
+#    entity_id: binary_sensor.github_new_commit_available
+#    state:
+#      - "on"
+#actions:
+#  - action: script.trigger_github_aaps_ci
+#    data: {}
+#mode: single
+
+###############################################################################
+# Optional: notify on new commit
+###############################################################################
+
+#alias: New AndroidAPS Github Commit
+#description: ""
+#triggers:
+#  - entity_id: binary_sensor.github_new_commit_available
+#    to: "on"
+#    trigger: state
+#actions:
+#  - action: notify.mobile_app
+#    data:
+#      message: >-
+#        New AndroidAPS GitHub commit: {{
+#        states('sensor.github_latest_commit_message') }}
+#mode: single
+
