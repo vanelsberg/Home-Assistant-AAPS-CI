@@ -1,0 +1,11 @@
+alias: New AndroidAPS Github Commit
+description: ""
+triggers:
+  - entity_id: binary_sensor.github_new_commit_available
+    to: "on"
+    trigger: state
+actions:
+  - action: notify.mobile_app_sm_s908b
+    data:
+      message: "AndroidAPS: New GiyHub commit! "
+mode: single
