@@ -115,3 +115,7 @@ Now validate you chnages to the configuration.yaml file goto the HA "developer t
 ## Raw YAML dashboard configuration for AAPS-CI:
 
   AAPS_ci_dashboard.yaml
+
+# GitHub integration
+
+  TODO: 
