@@ -1,0 +1,78 @@
+###############################################################################
+# AAPS-CI Dashboard (+ GitHub Commit Monitor  Package)
+###############################################################################
+
+input_text:
+  github_last_built_sha:
+    name: "GitHub Last Built SHA"
+    max: 64
+
+###############################################################################
+# AAPS-CI Dashboard Package
+###############################################################################
+
+sensor:
+  # AAPS-CI
+  - platform: rest
+    name: AndroidAPS Workflow Status
+    resource: https://api.github.com/repos/vanelsberg/AndroidAPS/actions/workflows/257323460/runs
+    headers:
+      Authorization: !secret aaps_ci_access_token_header
+    value_template: "{{ value_json.workflow_runs[0].status }}"
+    json_attributes_path: "$.workflow_runs[0]"
+    json_attributes:
+      - created_at
+      - status
+      - conclusion
+      - name
+      - run_number
+      - head_branch
+
+template:
+      # AAPS-CI
+      - name: "AndroidAPS Workflow Name"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'name') }}"
+      - name: "AndroidAPS Workflow Branch"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'head_branch') }}"
+      - name: "AndroidAPS Workflow Run Number"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'run_number') }}"
+      - name: "AndroidAPS Workflow Created At"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'created_at') }}"
+      - name: "AndroidAPS Workflow Conclusion"
+        state: "{{ state_attr('sensor.androidaps_workflow_status', 'conclusion') }}"
+      - name: "CI Status Label"
+        state: >
+          {% set sc = state_attr('sensor.androidaps_workflow_status', 'conclusion') %}
+          {% set s = states('sensor.androidaps_workflow_status') %}
+          {% if sc == 'cancelled' %}
+            ⛔ Cancelled
+          {% elif sc == 'failure' %}
+            ❌ Failed
+          {% elif s == 'queued' %}
+            ⏳ Queued
+          {% elif s == 'in_progress' %}
+            🟠 Running
+          {% elif s == 'completed' %}
+            ✅ Completed
+          {% else %}
+            ⚪ Idle
+          {% endif %}
+
+shell_command:
+  start_github_aaps_ci: 'bash /config/AAPS-CI/build.sh'
+
+script:
+  trigger_github_aaps_ci:
+    alias: "Start GitHub AAPS CI"
+    sequence:
+      - service: shell_command.start_github_aaps_ci
+
+      # Optional: wait a moment for sensors to refresh      
+      - delay: "00:00:02"
+
+      - service: input_text.set_value
+        alias: Store latest built SHA
+        target:
+          entity_id: input_text.github_last_built_sha
+        data:
+          value: "{{ states('sensor.github_latest_commit_sha') }}"
