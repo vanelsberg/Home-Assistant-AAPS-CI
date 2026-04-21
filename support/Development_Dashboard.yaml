@@ -129,25 +129,32 @@ views:
             entities:
               - entity: sensor.androidaps_workflow_status
               - entity: sensor.androidaps_workflow_conclusion
+              - entity: binary_sensor.github_new_commit_available
             logarithmic_scale: false
             grid_options:
               columns: full
-              rows: 2
+              rows: 3
         column_span: 4
+
+      #################################################################################
+      # (Un)comment the following section to disabled a GitHub latest commit overview card
+      #################################################################################
       - type: grid
         cards:
           - type: heading
-            heading: New section
+            heading: GitHub
+            heading_style: title
+            icon: mdi:git
           - type: markdown
             title: AndroidAPS Latest Commit
             content: >
+              |||
 
-              | _Field_ | _Value_ |
+              |-------|-------|
 
-              |:---------------|:-----------|
-
-              | **Message** | **{{ states('sensor.github_latest_commit_message')
-              }}** |
+              | **Message** | {{
+              states('sensor.github_latest_commit_message').split('\n')[0] ~ '
+              …' }} |
 
               | **Timestamp** | {{
               states('sensor.github_latest_commit_timestamp') }} |
@@ -169,4 +176,7 @@ views:
             grid_options:
               columns: full
               rows: auto
-        column_span: 4
+
+      column_span: 4
+      #################################################################################
+
