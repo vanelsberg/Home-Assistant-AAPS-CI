@@ -1,0 +1,14 @@
+# Automation to notify about new commits on the AndroidAPS GitHub repository.
+# This automation is triggered by a binary sensor that detects new commits and sends a notification to a mobile device.
+
+alias: New AndroidAPS Github Commit
+description: ""
+triggers:
+  - entity_id: binary_sensor.github_new_commit_available
+    to: "on"
+    trigger: state
+actions:
+  - action: notify.mobile_app_sm_s908b
+    data:
+      message: "AndroidAPS: New GitHub commit! "
+mode: single

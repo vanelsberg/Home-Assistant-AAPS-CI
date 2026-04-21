@@ -1,3 +1,11 @@
+# This automation schedules the AAPS-CI build to run every 6 hours,
+# but only if there is a new commit in the GitHub repository that is less than 72 hours old.
+
+# The "Force build" trigger is disabled by default, but can be enabled to trigger a build whenever the "New Commit" state changes. 
+# Use with care: enabling this trigger will cause a build to run immediately whenever a new commit is detected,
+# regardless of the time of day or the age of the commit!
+
+
 alias: Schedule AAPS-CI
 description: ""
 triggers:
@@ -14,7 +22,6 @@ conditions:
   - condition: numeric_state
     entity_id: sensor.github_latest_commit_age_hours
     below: 72
-    above: 0
   - condition: state
     entity_id: binary_sensor.github_new_commit_available
     state: "on"
@@ -28,11 +35,4 @@ actions:
         AAPS-CI Build triggered for commit {{
         states('sensor.github_latest_commit_sha')[:7] }}
       entity_id: binary_sensor.github_new_commit_available
-  - action: input_text.set_value
-    metadata: {}
-    target:
-      entity_id: input_text.github_last_built_sha
-    data:
-      value: "{{ states('sensor.github_latest_commit_sha') }}"
-    alias: Set github_last_built_sha
 mode: single
