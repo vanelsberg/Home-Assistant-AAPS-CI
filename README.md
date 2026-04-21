@@ -1,4 +1,13 @@
-# HomeAsistant AAPS_CI Integration
+# HomeAsistant AAPS_CI Integration V2
+
+# Note Major update
+
+2026-04-22
+    - Moved AAPS CI integration to a package
+    - Added integration with the GitHub API
+      Make sure to edit the file secrets.yaml for your environment!
+
+      TODO: Update content below for setting up with the new packages
 
 [HA Dashboard](https://github.com/vanelsberg/Home-Assistant-AAPS-CI/blob/main/doc/HA-AAPS-CI-dashboard.png)
 
