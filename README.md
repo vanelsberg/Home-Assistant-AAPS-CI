@@ -62,8 +62,8 @@ Your dashboard will not work without proper scrips. On your Home Asistant server
 
 Start with configuring and running the bash script in the confi/AAPS-CI directory frm the ubuntu/linux commandline to verify the connection to GitHub:
 
-1. Edit the config/AAPS-CI/_build.config_ file for your repoistory and owner name
-2. Run ./ci_workflows.sh to find your workflow ID for the WORKFLOW_NAME
+1. Edit the config/AAPS-CI/_build.config_ file for your repoistory name, owner name.
+2. Run ./ci_workflows.sh to find your workflow ID for the WORKFLOW_NAME (see details below)
 3. Edit the build.config for your WORKFLOW_ID
 4. Test run ./status.sh to find a list of latest CI runs (providing you did already run at least one)
 5. Test run ./sync_with_upstream.sh to sync your forked repository with the upstream AAPS repoistory
@@ -78,7 +78,7 @@ You will need your Git workflow ID for "Branche CI". To retrieve you can the fol
     curl -H "Authorization: token YOUR_GITHUB_TOKEN" \
         https://api.github.com/repos/OWNER/REPO/actions/workflows
 
-    Or alternatively you can use the _ci_workflows.sh_ script.
+    _Or alternatively you can use the _ci_workflows.sh_ script (recommended)._
 
 Now change the _build.config_ file for your situation:
 
