@@ -58,27 +58,33 @@ Make sure the following line are present. Add them when necessairy:
 
 Your dashboard will not work without proper scrips. On your Home Asistant server, test by running the following scripts without errors.
 
-**Note**: The scrips make use of the "jq" command (you can optionally install using 'sudo apt install jq')
+**Note**:
 
-Start with configuring and running the bash script in the confi/AAPS-CI directory frm the ubuntu/linux commandline to verify the connection to GitHub:
+    The bash scripts make use of the "jq" command (you can optionally install using 'sudo apt install jq')
 
-1. Edit the config/AAPS-CI/_build.config_ file for your repoistory name, owner name.
-2. Run ./ci_workflows.sh to find your workflow ID for the WORKFLOW_NAME (see details below)
+Start with configuring and running the bash scripts in the confi/AAPS-CI directory from the ubuntu/linux commandline to verify the connection to GitHub:
+
+1. Edit the config/AAPS-CI/_build.config_ file for your repoistory and owner name.
+2. Run ./ci_workflows.sh to find your WORKFLOW_ID for the WORKFLOW_NAME (see details below)
 3. Edit the build.config for your WORKFLOW_ID
-4. Test run ./status.sh to find a list of latest CI runs (providing you did already run at least one)
+4. Test run ./status.sh to find a list of latest CI runs (providing you did already run at least one CI build using GitHub)
 5. Test run ./sync_with_upstream.sh to sync your forked repository with the upstream AAPS repoistory
 6. Test run ./build.sh to start an AAPS CI build and verify it is running by checking github activity
 
 After copying, configuring and testing the necessay files as described, restart Home Assistant and verify it is running as expected.
 
-### Details on configuring the scrips: _build.config_
+**Note**:
+
+    The bash scripts can be used anytime to build from the Ubuntu commandline or for instance through a cron/systemd schedule.
+
+### Additional details on configuring the scrips: _build.config_
 
 You will need your Git workflow ID for "Branche CI". To retrieve you can the following "curl" command:
 
     curl -H "Authorization: token YOUR_GITHUB_TOKEN" \
         https://api.github.com/repos/OWNER/REPO/actions/workflows
 
-    _Or alternatively you can use the _ci_workflows.sh_ script (recommended)._
+_Or alternatively you can use the _ci_workflows.sh_ script (recommended)._
 
 Now change the _build.config_ file for your situation:
 
@@ -93,15 +99,15 @@ Now change the _build.config_ file for your situation:
 
 # HA Dashboard
 
-*Make sure to validate your changes goto the HA "developer tools" dashboard:*
+**Make sure to validate your changes through the HA "developer tools" dashboard:**
 
 - Click "Check configuration" (and when OK) "restart".
-- Your new Dashboard should now become active.
+- Your new integration should now become active.
 
 Create a new HA Dashboard:
 
 1. Goto HA Settings and click the "+Add dashboard" button.
-2. Select "New dashboard from scratch", name it to name of your choice and then create it.
+2. Select "New dashboard from scratch", name it to the name of your choice and then create it.
 3. In HA open your new dashboard and click the "Edit dashboard" option.
 4. Select the option "Raw configuration editor".
 5. Replace the YAML definition with the YAML definition for AAPS-CI
@@ -115,7 +121,7 @@ To validate your configuration goto the HA "developer tools" dashboard:
 
 Try starting a new build. There will be some delay before the Dashboard will start showing build status.
 
-You can validate through GitHub if the CI build task is running.
+You can validate through GitHub if the CI build task while it is running to completion in the same way it would when starting it from GitHub directly.
 
 # Automations:
 
@@ -123,4 +129,4 @@ You can validate through GitHub if the CI build task is running.
 2. Add a new basic/empty automation and save it
 3. Edit the new automation by using the RAW yaml editor and paste the content of the file _support/schedule_AAPS-CI.yaml_
 4. Save and close the automation
-5. You can now open the automation from HA and change or disable/enable.
+5. You can now open the automation from HA and change or disable/enable depending on your preferences.
