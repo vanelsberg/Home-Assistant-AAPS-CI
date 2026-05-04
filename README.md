@@ -108,20 +108,22 @@ Now change the _build.config_ file for your situation:
 
 ### Bash scripts for AAPS-CI Maintenance
 
-- _ci.config_
+- **_ci.config_**
 
     Configuration for ci_*.sh scripts
 
-- ./_ci_workflows.sh_
+- **_./ci_workflows.sh_**
 
     List all workflow Names and ID's
 
-- ./_ci_cleanupworkflowruns.sh [WORKFLOID] [--dry-run]_
-
-    Cleanup GitHub old workflow runs. When not defined on the commandline, the default WORKFLIW_ID from config is used.
-
     **Note:** For starters this scrip uses unauthenticated API calls. As a result you my hit GitHub's request rate limitting when uses multiple times in a row while testing. To solve, edit the scriptfile and comment/uncomment the lines as instructed.
 
+- ./**_ci_cleanupworkflowruns.sh [WORKFLOW_ID] [--dry-run]_**
+
+    Cleanup GitHub old workflow runs. When not defined on the commandline, the default WORKFLOW_ID from config is used. Use --dry-run for testing whitout actually deleting old runs
+
+    Edit the ci.config (WF_KEEP) to set the number of runs to keep
+    
 # HA Dashboard
 
 **Make sure to validate your changes through the HA "developer tools" dashboard:**
