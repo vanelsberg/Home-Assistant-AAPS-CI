@@ -106,7 +106,7 @@ Now change the _build.config_ file for your situation:
     OPT_BUILDVARIANT=fullRelease
     BRANCH="dev"
 
-### Bash scripts for AAPS-CI Maintenance
+### Bash scripts for AAPS-CI Maintenance (optional)
 
 - **_ci.config_**
 
