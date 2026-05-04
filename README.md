@@ -33,15 +33,24 @@ Clone the content of this repository to a temporary location. Then copy the foll
 - **config/support**.   (HA support files)
 
 ### Secrets
-Create or edit the file secrets.xml in the HA directory and add the folowing lines. 
-For detauilss see the file secrets.yaml in this repository:
+Create or edit the file **secrets.yaml** in the HA directory and add the folowing lines. 
+For detauils see the file secrets.yaml in this repository:
+
+    github_commits_url: "https://api.github.com/repos/nightscout/AndroidAPS/commits?sha=dev"
 
     aaps_ci_access_token_header: "Bearer <Your AAPS CI Personal token>"
     aaps_ci_access_token_ha: "<Your AAPS CI Personal token>"
-    github_commits_url: "https://api.github.com/repos/nightscout/AndroidAPS/commits?sha=dev"
 
-- The token was defined when setting up AAPS-CI browser build.
+    workflow_access_token_ha: "<Your Github API access token for AAPS CI Workflow maintenance>"
+
 - The github_commits_url point to the AAPS development branch.
+
+- The 'Personal Token' token can be the one defined when setting up AAPS-CI browser build or you can craete a new access token from GitHub at:
+https://github.com/settings/personal-access-tokens (classic token)
+
+- The 'workflow_access_token_ha':
+Is to be defined when using the ci_*.sh AAPS CI Workflow maintenance scripts for cleaning up workflow. This token should have read/write access, so _create a fine grained token with only access to your repo!_ ) You can create this token from GitHub at:
+https://github.com/settings/personal-access-tokens (fine grained token)
 
 # HA configuration.yaml
 
@@ -96,6 +105,22 @@ Now change the _build.config_ file for your situation:
     # What to build
     OPT_BUILDVARIANT=fullRelease
     BRANCH="dev"
+
+### Bash scripts for AAPS-CI Maintenance
+
+- _ci.config_
+
+    Configuration for ci_*.sh scripts
+
+- ./_ci_workflows.sh_
+
+    List all workflow Names and ID's
+
+- ./_ci_cleanupworkflowruns.sh [WORKFLOID] [--dry-run]_
+
+    Cleanup GitHub old workflow runs. When not defined on the commandline, the default WORKFLIW_ID from config is used.
+
+    **Note:** For starters this scrip uses unauthenticated API calls. As a result you my hit GitHub's request rate limitting when uses multiple times in a row while testing. To solve, edit the scriptfile and comment/uncomment the lines as instructed.
 
 # HA Dashboard
 
